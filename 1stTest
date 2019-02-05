@@ -1,0 +1,49 @@
+/*Febryary of 2019
+ * This is a test for the pumps and the heater.It is not meant for dishwashing.
+ * Connect the main pump at REL1,the heater at REL2 and the drain pump at REL3.
+ * "Fill" the dishwasher with water using an external source of water, and then
+ * run the test to see performance and issues of the motors and heater.Use the 
+ * switch 2 to control test/draining mode(ON= test mode, OFF= draining mode).
+ * RELAY 1 = MAIN PUMP
+ * RELAY 0 = HEATER
+ * RELAY 3 = DRAIN
+ */
+#define REL0 5
+#define REL1 4
+#define REL2 3
+#define REL3 2
+
+#define SWI1 6
+#define SWI2 7
+#define THERM A2
+
+int switch1 = 0;
+int switch2 = 0;
+
+void setup() {
+  pinMode(REL0, OUTPUT);
+  pinMode(REL1, OUTPUT);  // MAIN PUMP
+  pinMode(REL2, OUTPUT);  // HEATING ELEMENT
+  pinMode(REL3, OUTPUT);  // DRAIN PUMP
+  pinMode(SWI1,INPUT);
+  pinMode(SWI2, INPUT);
+  pinMode(THERM, INPUT);
+  digitalWrite(REL1,HIGH); //start the main pump
+  digitalWrite(REL0,HIGH); //start the heating element
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  //getting the state of the switch 1
+  switch2 = digitalRead(SWI2);
+  while(switch2==1){
+    digitalWrite(REL3,LOW);  //shut down the drain pump
+    digitalWrite(REL1,HIGH);  //start the main pump
+    digitalWrite(REL0,HIGH);  //start the heating element
+    switch2 = digitalRead(SWI2);
+  }
+  digitalWrite(REL3,HIGH);  //start the drain pump  
+  digitalWrite(REL1,LOW);  //stop the main pump
+  digitalWrite(REL0,LOW);  //stop the heater
+  
+}
