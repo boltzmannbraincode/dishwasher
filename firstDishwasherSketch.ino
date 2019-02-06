@@ -1,11 +1,3 @@
-/*Febryary of 2019
- * This is a sketch for the arduino to act as a dishwasher brain circuit
- * using 4 relays as control devices(controlling motors,heaters etc.),
- * a thermometer(,thermistor, for measuring the temperature of the water)  
- * and switches, for the user to be able to enter some basic settings
- * (such as economic mode or rinse-only). There can be 3 more sensors added 
- * in the near future(water transparency,door opened etc.)
- */
 //here you can define the pins that control your elements
 #define main_pump 2
 #define drain_pump 3
@@ -19,6 +11,8 @@
 #define green_led 10
 #define red_led 11
 
+int elapsed_time,current_time,start_time;
+float volt_temp_limit = 3; //IMPORTANT:  the voltage that the thermometer pin has when peak temperature is reached
 
 void setup() {
 pinMode(main_pump,OUTPUT);
@@ -30,14 +24,77 @@ pinMode(power_switch,INPUT);
 pinMode(thermometer, INPUT);
 pinMode(green_led,OUTPUT);
 pinMode(red_led, OUTPUT);
+start_green_led(); //indicating that no program is currently running
 }
 
-void loop() {
+void loop() { // here lies the first simple wahsing program!
 
+ if(get_switch() == 1){ // if someone opens the switch, the program starts
+  stop_green_led();
+  start_red_led(); //showing that a program has started running
+  
+  //drain the leftover water
+  start_drain_pump();
+  delay(10000);
+  stop_drain_pump();
+  
+  //filling tank with water
+  while(get_floater() == 0){
+    open_inlet_valve();
+  }
+  close_inlet_valve(); //when floater clicks, it stops filling
+  delay(500);
+  
+  //TODO: open detergent case
 
+  //start of washing phase
+  unsigned long start_time = millis();//get the time that the washing mode started
+  start_main_pump();
+  start_heating_element();
+  while( elapsed_time <(45*60*1000)){//while the washing mode hasn't run for a full 45 miniutes
+    //(now the main pump is alread running)
+    if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
+      stop_heating_element();
+      /*if the voltage at thermometer pin is less than our defined limit voltage, it means that 
+       * also the resistance has dropped, wich means that the temperature is higher than what 
+       * we want.All that because hotter means less resistance.
+       */
+    }
+    else{
+      start_heating_element();
+    }
+    unsigned long current_time = millis(); 
+    unsigned long elapsed_time = current_time - start_time;  //calculate how much time has passed 
+    /*we calculate the elapsed time at the end of the loop so that it can be as close
+     * as possible to the statement check, thus improvinf accuracy.
+     */
+  }
+  stop_heating_element();
+  stop_main_pump();
+  delay(10000);  //delay so that the shelves can drain
+
+  //rinsing phase
+  start_drain_pump();
+  delay(30000);
+  stop_main_pump(); // drain the water from the washing phase
+  while(get_floater() == 0){  //filling tank with water
+    open_inlet_valve();
+  }
+  close_inlet_valve(); //when floater clicks, it stops filling
+  delay(500);
+  start_main_pump();
+  delay(15*60*1000);  //rinse the dishes for 15 mins
+  stop_main_pump();
+  start_drain_pump();
+  delay(30000);
+  stop_main_pump(); // drain the water from the rinsing phase
+
+  //green led indicates that no program is currently running
+  start_green_led();
+ }
 }
 
-//F U N C T I O N S !
+//F U N C T I O N S ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void start_main_pump(){
   delay(100);
@@ -59,7 +116,7 @@ void stop_heating_element(){
   digitalWrite(heating_element,LOW);
 }
 
-void start_drain_pupm(){
+void start_drain_pump(){
   delay(100);
   digitalWrite(drain_pump,HIGH);
 }
@@ -104,9 +161,12 @@ int get_floater(){
   return floater_state; //returns 1 if floater is activated(full tank)
 }
 
+void open_inlet_valve(){
+  delay(100);
+  digitalWrite(inlet_valve,HIGH);
+}
 
-
-
-
-
-
+void close_inlet_valve(){
+  delay(100);
+  digitalWrite(inlet_valve,LOW);
+}
