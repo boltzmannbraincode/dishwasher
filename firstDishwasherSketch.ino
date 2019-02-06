@@ -34,15 +34,9 @@ void loop() { // here lies the first simple wahsing program!
   start_red_led(); //showing that a program has started running
   
   //drain the leftover water
-  start_drain_pump();
-  delay(10000);
-  stop_drain_pump();
-  
+  drain_tank();
   //filling tank with water
-  while(get_floater() == 0){
-    open_inlet_valve();
-  }
-  close_inlet_valve(); //when floater clicks, it stops filling
+  fill_tank();
   delay(500);
   
   //TODO: open detergent case
@@ -74,20 +68,15 @@ void loop() { // here lies the first simple wahsing program!
   delay(10000);  //delay so that the shelves can drain
 
   //rinsing phase
-  start_drain_pump();
-  delay(30000);
-  stop_main_pump(); // drain the water from the washing phase
-  while(get_floater() == 0){  //filling tank with water
-    open_inlet_valve();
-  }
-  close_inlet_valve(); //when floater clicks, it stops filling
+  drain_tank();
+  fill_tank();
   delay(500);
+  
   start_main_pump();
   delay(15*60*1000);  //rinse the dishes for 15 mins
   stop_main_pump();
-  start_drain_pump();
-  delay(30000);
-  stop_main_pump(); // drain the water from the rinsing phase
+  
+  drain_tank();
 
   //green led indicates that no program is currently running
   start_green_led();
@@ -170,3 +159,17 @@ void close_inlet_valve(){
   delay(100);
   digitalWrite(inlet_valve,LOW);
 }
+
+void drain_tank(){
+  start_drain_pump();
+  delay(10000);
+  stop_drain_pump();
+}
+
+void fill_tank(){
+  while(get_floater() == 0){
+    open_inlet_valve();
+  }
+  close_inlet_valve(); //when floater clicks, it stops filling
+}
+
