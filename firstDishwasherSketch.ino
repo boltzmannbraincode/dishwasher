@@ -1,8 +1,8 @@
 //here you can define the pins that control your elements
-#define main_pump 2
-#define drain_pump 3
-#define heating_element 4
-#define inlet_valve 5
+#define main_pump 2  //RELAY 3
+#define drain_pump 3  //RELAY 2
+#define heating_element 4  //RELAY 1
+#define inlet_valve 5  //RELAY 0
 
 #define floater 6
 #define power_switch 7
@@ -11,7 +11,7 @@
 #define green_led 10
 #define red_led 11
 
-int elapsed_time,current_time,start_time;
+unsigned long elapsed_time,current_time,start_time;
 float volt_temp_limit = 3; //IMPORTANT:  the voltage that the thermometer pin has when peak temperature is reached
 
 void setup() {
@@ -42,10 +42,11 @@ void loop() { // here lies the first simple wahsing program!
   //TODO: open detergent case
 
   //start of washing phase
-  unsigned long start_time = millis();//get the time that the washing mode started
+  start_time = millis();//get the time that the washing mode started
   start_main_pump();
   start_heating_element();
-  while( elapsed_time <(45*60*1000)){//while the washing mode hasn't run for a full 45 miniutes
+  unsigned long time_limit = 20000;  //for how many ms the washing phase will run
+  while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
     //(now the main pump is alread running)
     if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
       stop_heating_element();
@@ -57,15 +58,15 @@ void loop() { // here lies the first simple wahsing program!
     else{
       start_heating_element();
     }
-    unsigned long current_time = millis(); 
-    unsigned long elapsed_time = current_time - start_time;  //calculate how much time has passed 
+    current_time = millis(); 
+    elapsed_time = current_time - start_time;  //calculate how much time has passed 
     /*we calculate the elapsed time at the end of the loop so that it can be as close
      * as possible to the statement check, thus improvinf accuracy.
      */
   }
   stop_heating_element();
   stop_main_pump();
-  delay(10000);  //delay so that the shelves can drain
+  delay(10000);  //10 sec delay so that the shelves can drain
 
   //rinsing phase
   drain_tank();
@@ -86,32 +87,26 @@ void loop() { // here lies the first simple wahsing program!
 //F U N C T I O N S ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void start_main_pump(){
-  delay(100);
   digitalWrite(main_pump,HIGH);
 }
 
 void stop_main_pump(){
-  delay(100);
   digitalWrite(main_pump,LOW);
 }
 
 void start_heating_element(){
-  delay(100);
   digitalWrite(heating_element,HIGH);
 }
 
 void stop_heating_element(){
-  delay(100);
   digitalWrite(heating_element,LOW);
 }
 
 void start_drain_pump(){
-  delay(100);
   digitalWrite(drain_pump,HIGH);
 }
 
 void stop_drain_pump(){
-  delay(100);
   digitalWrite(drain_pump,LOW);
 }
 
@@ -172,4 +167,3 @@ void fill_tank(){
   }
   close_inlet_valve(); //when floater clicks, it stops filling
 }
-
