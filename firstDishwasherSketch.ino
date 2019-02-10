@@ -2,7 +2,8 @@
 #define main_pump 2  //RELAY 3
 #define drain_pump 3  //RELAY 2
 #define heating_element 4  //RELAY 1
-#define inlet_valve 5  //RELAY 0
+// #define sinlet_valve 5  //RELAY 0
+#define secondary_coil 5  //RELAY 0
 
 #define floater 6
 #define power_switch 7
@@ -18,7 +19,7 @@ void setup() {
 pinMode(main_pump,OUTPUT);
 pinMode(drain_pump,OUTPUT);
 pinMode(heating_element, OUTPUT);
-pinMode(inlet_valve,OUTPUT);
+pinMode(secondary_coil,OUTPUT);
 pinMode(floater,INPUT);
 pinMode(power_switch,INPUT);
 pinMode(thermometer, INPUT);
@@ -33,20 +34,14 @@ void loop() { // here lies the first simple wahsing program!
   stop_green_led();
   start_red_led(); //showing that a program has started running
   
-  //drain the leftover water
-  drain_tank();
-  //filling tank with water
-  fill_tank();
-  delay(500);
   
-  //TODO: open detergent case
 
   //start of washing phase
   start_time = millis();//get the time that the washing mode started
   start_main_pump();
   start_heating_element();
-  unsigned long time_limit = 20000;  //for how many ms the washing phase will run
-  while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
+  unsigned long time_limit = 300000;  //for how many ms the washing phase will run
+  while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 10 miniutes(i've put half of the ms bcoz arduino pro mini has some sort of a problem with millis() )
     //(now the main pump is alread running)
     if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
       stop_heating_element();
@@ -74,7 +69,7 @@ void loop() { // here lies the first simple wahsing program!
   delay(500);
   
   start_main_pump();
-  delay(15*60*1000);  //rinse the dishes for 15 mins
+  delay(100000);  //rinse the dishes for 3-4 mins
   stop_main_pump();
   
   drain_tank();
@@ -87,7 +82,15 @@ void loop() { // here lies the first simple wahsing program!
 //F U N C T I O N S ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void start_main_pump(){
+  start_secondary_coil()
   digitalWrite(main_pump,HIGH);
+  delay(2000);
+  stop_secondary_coil();
+  /*here could be a while loop that uses the pressure switch(located at the heating element in my model)
+   * that stops the seondary coil only when the pressure switch is activated, telling us that the motor 
+   * has started running at close-to-full rpm.
+   */
+  
 }
 
 void stop_main_pump(){
@@ -139,20 +142,14 @@ int get_switch(){
   return switch_state;
 }
 
-int get_floater(){
-  int floater_state;
-  floater_state = digitalRead(floater);
-  return floater_state; //returns 1 if floater is activated(full tank)
+
+
+void start_secondary_coil(){
+  digitalWrite(secondary_coil,HIGH);
 }
 
-void open_inlet_valve(){
-  delay(100);
-  digitalWrite(inlet_valve,HIGH);
-}
-
-void close_inlet_valve(){
-  delay(100);
-  digitalWrite(inlet_valve,LOW);
+void stop_secondary_coil(){
+  digitalWrite(secondary_coil,LOW);
 }
 
 void drain_tank(){
@@ -161,9 +158,3 @@ void drain_tank(){
   stop_drain_pump();
 }
 
-void fill_tank(){
-  while(get_floater() == 0){
-    open_inlet_valve();
-  }
-  close_inlet_valve(); //when floater clicks, it stops filling
-}
