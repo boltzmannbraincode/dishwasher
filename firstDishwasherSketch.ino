@@ -1,4 +1,5 @@
 //here you can define the pins that control your elements
+#define secondary_coil 8  //RELAY 4
 #define main_pump 2  //RELAY 3
 #define drain_pump 3  //RELAY 2
 #define heating_element 4  //RELAY 1
@@ -10,6 +11,7 @@
 
 #define green_led 10
 #define red_led 11
+#define buzzer 9  //notification buzzer
 
 unsigned long elapsed_time,current_time,start_time;
 float volt_temp_limit = 3; //IMPORTANT:  the voltage that the thermometer pin has when peak temperature is reached
@@ -39,6 +41,7 @@ void loop() { // here lies the first simple wahsing program!
   fill_tank();
   delay(500);
   
+  buzz();
   //TODO: open detergent case
 
   //start of washing phase
@@ -67,7 +70,9 @@ void loop() { // here lies the first simple wahsing program!
   stop_heating_element();
   stop_main_pump();
   delay(10000);  //10 sec delay so that the shelves can drain
-
+  
+  buzz(); delay(500); buzz();  //double buzz to show transition to rinsing phase
+  
   //rinsing phase
   drain_tank();
   fill_tank();
@@ -87,7 +92,11 @@ void loop() { // here lies the first simple wahsing program!
 //F U N C T I O N S ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void start_main_pump(){
-  digitalWrite(main_pump,HIGH);
+  start_secondary_coil();
+  digitalWrite(main_pump,HIGH);  //start main pump
+  delay(5000);  //leave the secondary coil energized for 5 sec
+  stop_secondary_coil();  //stop secondary coil, now that the motor is(should be) running at a high rpm
+ //TODO: add dynamic secondary coil switching using the pressure switch
 }
 
 void stop_main_pump(){
@@ -166,4 +175,17 @@ void fill_tank(){
     open_inlet_valve();
   }
   close_inlet_valve(); //when floater clicks, it stops filling
+}
+
+void start_secondary_coil(){
+  digitalWrite(secondary_coil,HIGH);
+}
+void stop_secondary_coil(){
+  digitalWrite(secondary_coil,LOW);
+}
+
+void buzz(){
+ digitalWrite(buzzer,HIGH);
+ delay(1000);
+ digitalWrite(buzzer,LOW);
 }
