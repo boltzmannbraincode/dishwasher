@@ -26,6 +26,8 @@ pinMode(power_switch,INPUT);
 pinMode(thermometer, INPUT);
 pinMode(green_led,OUTPUT);
 pinMode(red_led, OUTPUT);
+pinMode(secondary_coil, OUTPUT);
+pinMode(buzzer, OUTPUT);
 start_green_led(); //indicating that no program is currently running
 }
 
