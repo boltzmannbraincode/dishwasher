@@ -50,7 +50,7 @@ void loop() { // here lies the first simple wahsing program!
   start_time = millis();//get the time that the washing mode started
   start_main_pump();
   start_heating_element();
-  unsigned long time_limit = 20000;  //for how many ms the washing phase will run
+  unsigned long time_limit = 300000;  //for how many ms the washing phase will run
   while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
     //(now the main pump is alread running)
     if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
@@ -81,8 +81,10 @@ void loop() { // here lies the first simple wahsing program!
   delay(500);
   
   start_main_pump();
-  delay(15*60*1000);  //rinse the dishes for 15 mins
+  delay(30000);  //rinse the dishes for 15 mins
   stop_main_pump();
+
+  buzz(); delay(500); buzz(); delay(500); buzz(); buzz(); 
   
   drain_tank();
 
@@ -168,7 +170,7 @@ void close_inlet_valve(){
 
 void drain_tank(){
   start_drain_pump();
-  delay(10000);
+  delay(20000);
   stop_drain_pump();
 }
 
