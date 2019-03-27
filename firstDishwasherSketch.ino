@@ -46,11 +46,11 @@ void loop() { // here lies the first simple wahsing program!
   buzz();
   //TODO: open detergent case
 
-  //start of washing phase
+  //start of washing phase 1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`````
   start_time = millis();//get the time that the washing mode started
   start_main_pump();
   start_heating_element();
-  unsigned long time_limit = 300000;  //for how many ms the washing phase will run
+  unsigned long time_limit = 300000;  //run for 5 min(10 min irl)
   while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
     //(now the main pump is alread running)
     if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
@@ -71,24 +71,71 @@ void loop() { // here lies the first simple wahsing program!
   }
   stop_heating_element();
   stop_main_pump();
-  delay(10000);  //10 sec delay so that the shelves can drain
+  
+  delay(10000);
+  
+  //start of rinse phase 1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //drain the leftover water
+  drain_tank();
+  delay(2000);
+  //filling tank with water
+  fill_tank();
+  delay(500);
+  start_main_pump();
+  delay(60000);  //rinse the dishes for 2 min
+  stop_main_pump();
+  
+  
+  //start of washing phase 2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~````
+  drain_tank();
+  delay(2000);
+  //filling tank with water
+  fill_tank();
+  delay(500);
+  start_time = millis();//get the time that the washing mode started
+  start_main_pump();
+  start_heating_element();
+  unsigned long time_limit = 150000;  //run for 2.5 min(5 min irl)
+  while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
+    //(now the main pump is alread running)
+    if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
+      stop_heating_element();
+      /*if the voltage at thermometer pin is less than our defined limit voltage, it means that 
+       * also the resistance has dropped, wich means that the temperature is higher than what 
+       * we want.All that because hotter means less resistance.
+       */
+    }
+    else{
+      start_heating_element();
+    }
+    current_time = millis(); 
+    elapsed_time = current_time - start_time;  //calculate how much time has passed 
+    /*we calculate the elapsed time at the end of the loop so that it can be as close
+     * as possible to the statement check, thus improvinf accuracy.
+     */
+  }
+  stop_heating_element();
+  stop_main_pump();
+  
+  delay(100000);  //100 sec delay so that the shelves can drain
   
   buzz(); delay(500); buzz();  //double buzz to show transition to rinsing phase
   
-  //rinsing phase
+  //rinsing phase 2 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
   drain_tank();
   fill_tank();
   delay(500);
   
   start_main_pump();
-  delay(30000);  //rinse the dishes for 15 mins
+  delay(30000);  //rinse the dishes for 1 min
   stop_main_pump();
 
-  buzz(); delay(500); buzz(); delay(500); buzz(); buzz(); 
+  buzz(); delay(500); buzz(); delay(500); buzz(); 
   
   drain_tank();
 
   //green led indicates that no program is currently running
+  stop_red_led();
   start_green_led();
  }
 }
@@ -170,7 +217,7 @@ void close_inlet_valve(){
 
 void drain_tank(){
   start_drain_pump();
-  delay(20000);
+  delay(15000);
   stop_drain_pump();
 }
 
