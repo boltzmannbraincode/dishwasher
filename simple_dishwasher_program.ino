@@ -14,7 +14,6 @@
 #define buzzer 9  //notification buzzer
 
 unsigned long elapsed_time,current_time,start_time;
-float volt_temp_limit = 3; //IMPORTANT:  the voltage that the thermometer pin has when peak temperature is reached
 
 void setup() {
 pinMode(main_pump,OUTPUT);
@@ -42,7 +41,7 @@ void loop() { // here lies the first simple wahsing program!
   buzz(1);  // signal the completion of the first stage
 
   //start of washing phase
-  hotwash(600);  // hot wash for 600 sec -> 10 mins
+  hotwash(600,3);  // hot wash for 600 sec -> 10 mins, with a voltage thermometer limit of 3 V
   buzz(2); //double buzz to show transition to rinsing phase
   
   //rinsing phase
@@ -163,7 +162,8 @@ void buzz(int times){  // how many times to buzz
  }
 }
 
-void hotwash(int time){  // specify time in seconds
+void hotwash(int time, float volt_temp_limit){  // specify time in seconds
+ // volt_temp_limit is the limit of volts of the thermometer pin
   start_time = millis();//get the time that the washing mode started
   start_main_pump();
   start_heating_element();
