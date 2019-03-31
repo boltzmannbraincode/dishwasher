@@ -39,15 +39,15 @@ void loop() { // here lies the first simple wahsing program!
   fill_tank(); // filling tank with water
   delay(500);
   
-  buzz();  // signal the completion of the first stage
+  buzz(1);  // signal the completion of the first stage
 
   //start of washing phase
   hotwash(600);  // hot wash for 600 sec -> 10 mins
-  buzz(); delay(500); buzz();  //double buzz to show transition to rinsing phase
+  buzz(2); //double buzz to show transition to rinsing phase
   
   //rinsing phase
   rinse();
-  buzz(); delay(500); buzz(); delay(500); buzz(); buzz(); 
+  buzz(3);
   
   drain_tank();
 
@@ -152,10 +152,15 @@ void stop_secondary_coil(){
   digitalWrite(secondary_coil,LOW);
 }
 
-void buzz(){
- digitalWrite(buzzer,HIGH);
- delay(1000);
- digitalWrite(buzzer,LOW);
+void buzz(int times){  // how many times to buzz
+ int i = 0;
+ while (i<times){
+  digitalWrite(buzzer,HIGH);
+  delay(1000);
+  digitalWrite(buzzer,LOW);
+  delay(1000);
+  i++;
+ }
 }
 
 void hotwash(int time){  // specify time in seconds
@@ -163,7 +168,7 @@ void hotwash(int time){  // specify time in seconds
   start_main_pump();
   start_heating_element();
   unsigned long time_limit = time*500;  //for how many ms the washing phase will run
-  while( elapsed_time < time_limit){//while the washing mode hasn't run for a full 20 SECONDS
+  while( elapsed_time < time_limit){
     //(now the main pump is alread running)
     if(get_temperature()<((1024*volt_temp_limit)/5)){ //converting volt_temp_limit to a value between 0 and 1024
       stop_heating_element();
@@ -177,15 +182,10 @@ void hotwash(int time){  // specify time in seconds
     }
     current_time = millis(); 
     elapsed_time = current_time - start_time;  //calculate how much time has passed 
-    /*we calculate the elapsed time at the end of the loop so that it can be as close
-     * as possible to the statement check, thus improvinf accuracy.
-     */
   }
   stop_heating_element();
   stop_main_pump();
-  delay(10000); 
-  delay(10000);
-  delay(10000);   // 30 sec delay so that the shelves can drain
+  delay(10000);   delay(10000);   delay(10000);   // 30 sec delay so that the shelves can drain
 }
 
 void rinse(){
