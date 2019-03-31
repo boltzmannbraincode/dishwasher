@@ -1,4 +1,4 @@
-This is an arduino programm to cotrol the relay board of a dishwasher. After my dishwasher's cotrol PCB failed twice, I had to replace 
+This is an arduino program to cotrol the relay board of a dishwasher. After my dishwasher's cotrol PCB failed twice, I had to replace 
 it with something less costly than an official cotrol PCB which costs around 40 times more than an arduino (Pro Mini in my case). 
 All i did was keep the existing relays (de-soldered from the PCB of the dishwasher) and connect them to the arduino using some diodes 
 flyback protection, and connected the temperature and water-level sensors to the arduino using some resistors.I also added a button to 
