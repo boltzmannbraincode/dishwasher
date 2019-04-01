@@ -13,6 +13,8 @@
 #define red_led 11
 #define buzzer 9  //notification buzzer
 
+#define has_secondary_coil 1  //if it is 1, it means that you have a different relay on each coil of the motor
+
 unsigned long elapsed_time,current_time,start_time;
 
 void setup() {
@@ -59,10 +61,14 @@ void loop() { // here lies the first simple wahsing program!
 //F U N C T I O N S ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void start_main_pump(){
-  start_secondary_coil();
+  if (has_secondary_coil == 1){
+    start_secondary_coil();
+  }
   digitalWrite(main_pump,HIGH);  //start main pump
-  delay(5000);  //leave the secondary coil energized for 5 sec
-  stop_secondary_coil();  //stop secondary coil, now that the motor is(should be) running at a high rpm
+  if (has_secondary_coil == 1){
+    delay(5000);  //leave the secondary coil energized for 5 sec
+    stop_secondary_coil();  //stop secondary coil, now that the motor is(should be) running at a high rpm
+  }
  //TODO: add dynamic secondary coil switching using the pressure switch
 }
 
