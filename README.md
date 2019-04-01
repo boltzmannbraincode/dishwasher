@@ -41,12 +41,14 @@ drain_tank():
 fill_tank():
   it opens the inlet valve until the limit floater gets activated(meaning that the water tank is full).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<b>Bonus Info:                                                                                                                  </b>
+<b>Bonus Info:      </b>
+  <br></br>
   <b>secondary_coil , has_secondary_coil</b>: the dishwasher in my case, has an AC motor with 2 coils, the primary and the secondary.
   The primary coil is used to constantly power the motor, and the secondary it is used in combination with the primary just to start it.
   In most cases while the secondary coil is running, the motor is producing excessive heat so you want to stop it after the motor 
   starts spinning. To do this, set has_secondary_coil = 1, and configure the relay of your secondary coil with #define secondary_coil.
   After that, the start_main_pump() function will use the secondary coil to start the motor for 5 seconds,and then it will shut it off.
+  <br></br>
   <b>get_temperature()</b>: the dishwasher uses a thermistor(a resistor whose value changes vigorously with fluctuations of the 
   temperature) to get the temperature of the water in its tank. The one end of the thermistor is connecetd to the 5V of the arduino, and 
   its other end is connected to the *thermometer* pin(defined as thermometer, the pin must be capable of analog read).The thermometer 
