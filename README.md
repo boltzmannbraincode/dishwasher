@@ -64,5 +64,5 @@ drain_tank() and fill_tank() to make whatever program you want.
   formula *reference_resistance * (1 / ((Vin / Vout) - 1))* from Ohm Law to measure the value of our thermistor. The function then 
   <b>returns the resistance</b>! You have to test your thermistor or get its temperature-to-resistance graph from its datasheet to 
   theoretically determine your desired resistance limit.
-  <img src="https://www.zarpanews.gr/wp-content/uploads/2018/02/mpalot_glent.jpg" alt="description" height="48" width="100" />
+
   
