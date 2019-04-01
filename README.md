@@ -48,7 +48,7 @@ drain_tank() and fill_tank() to make whatever program you want.
   it opens the inlet valve until the limit floater gets activated(meaning that the water tank is full).
 
 <b>Bonus Info:      </b>
-  <br / >
+  <br />
   <b>secondary_coil , has_secondary_coil</b>: the dishwasher in my case, has an AC motor with 2 coils, the primary and the secondary.
   The primary coil is used to constantly power the motor, and the secondary it is used in combination with the primary just to start it.
   In most cases while the secondary coil is running, the motor is producing excessive heat so you want to stop it after the motor 
