@@ -38,19 +38,28 @@ void loop() { // here lies the first simple wahsing program!
   start_red_led(); //showing that a program has started running
   drain_tank();  // drain the leftover water
   fill_tank(); // filling tank with water
-  delay(500);
   
   buzz(1);  // signal the completion of the first stage
 
-  //start of washing phase
+  // start of washing phase
   hotwash(600,3);  // hot wash for 600 sec -> 10 mins, with a voltage thermometer limit of 3 V
   buzz(2); //double buzz to show transition to rinsing phase
+  wait(3000);  //pause for 5 miniutes
   
-  //rinsing phase
+  // rinsing phase 1
   rinse();
   buzz(3);
   
   drain_tank();
+  
+  wait(6000);  // wait 10 miniutes
+  
+  // rinsing phase 4
+  rinse();
+  buzz(4);
+  drain_tank();
+  
+  
 
   //green led indicates that no program is currently running
   stop_red_led();
@@ -202,4 +211,17 @@ void rinse(){
   start_main_pump();
   delay(30000);  //rinse the dishes for 1 mins
   stop_main_pump();
+}
+
+void wait(int seconds){  //wait for an amount of seconds
+ start_time = millis();//get the time that the washing mode started
+ start_main_pump();
+ start_heating_element();
+ unsigned long time_limit = time*500;  //for how many ms the washing phase will run
+ while( elapsed_time < time_limit){
+  // do nothing
+  current_time = millis(); 
+  elapsed_time = current_time - start_time;  //calculate how much time has passed 
+ }
+ 
 }
